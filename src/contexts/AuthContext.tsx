@@ -10,7 +10,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (identifier: string) => Promise<void>;
+  login: (code: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -76,27 +76,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  async function login(identifier: string) {
+  async function login(code: string) {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .or(`phone_number.eq.${identifier},username.eq.${identifier}`)
+      // Verifica o código na tabela verification_codes
+      const { data: verificationData, error: verificationError } = await supabase
+        .from('verification_codes')
+        .select('*, users(*)')
+        .eq('code', code)
+        .eq('used', false)
+        .gt('expires_at', new Date().toISOString())
         .single();
 
-      if (error) throw error;
-      if (!data) throw new Error('Usuário não encontrado');
+      if (verificationError || !verificationData) {
+        throw new Error('Código inválido ou expirado');
+      }
+
+      // Marca o código como usado
+      await supabase
+        .from('verification_codes')
+        .update({ used: true })
+        .eq('id', verificationData.id);
+
+      const userData = verificationData.users;
 
       // Salva a sessão do usuário
       const session = {
-        user: data,
+        user: userData,
         session_id: Date.now(),
         last_activity: new Date().toISOString()
       };
 
-      localStorage.setItem('pokemon_user', JSON.stringify(data));
+      localStorage.setItem('pokemon_user', JSON.stringify(userData));
       localStorage.setItem('pokemon_session', JSON.stringify(session));
-      setUser(data);
+      setUser(userData);
 
     } catch (error) {
       console.error('Erro ao fazer login:', error);
