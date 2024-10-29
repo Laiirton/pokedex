@@ -1,17 +1,29 @@
 import { toast } from 'sonner';
 
+interface PokemonType {
+  slot: number;
+  type: {
+    name: string;
+    url: string;
+  };
+}
+
+interface PokemonSprites {
+  front_default: string;
+  front_shiny: string;
+  other: {
+    'official-artwork': {
+      front_default: string;
+      front_shiny: string;
+    };
+  };
+}
+
 interface PokemonDetails {
   id: number;
   name: string;
-  sprites: {
-    front_default: string;
-    front_shiny: string;
-  };
-  types: {
-    type: {
-      name: string;
-    };
-  }[];
+  sprites: PokemonSprites;
+  types: PokemonType[];
   is_legendary: boolean;
   is_mythical: boolean;
 }
