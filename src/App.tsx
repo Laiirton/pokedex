@@ -7,6 +7,7 @@ import PokemonList from '@/pages/PokemonList';
 import Trades from '@/pages/Trades';
 import Companion from '@/pages/Companion';
 import CatchPokemon from '@/pages/CatchPokemon';
+import Ranking from '@/pages/Ranking';
 import Layout from '@/components/Layout';
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="/catch" element={<CatchPokemon />} />
             <Route path="/trades" element={<Trades />} />
             <Route path="/companion" element={<Companion />} />
+            <Route path="/ranking" element={<Ranking />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
