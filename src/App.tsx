@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
-import Login from '@/pages/Login';
+import { LoginScreen } from '@/components/login-screen';
 import Dashboard from '@/pages/Dashboard';
 import PokemonList from '@/pages/PokemonList';
 import Trades from '@/pages/Trades';
@@ -15,7 +15,7 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<LoginScreen />} />
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/pokemon" element={<PokemonList />} />
