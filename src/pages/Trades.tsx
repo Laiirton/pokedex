@@ -94,81 +94,95 @@ export default function Trades() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Trade History</h1>
+    <div className="space-y-8">
+      <div className="page-header">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          Histórico de Trocas
+        </h1>
+      </div>
 
       <div className="space-y-4">
         {trades.map((trade) => (
-          <Card key={trade.id}>
-            <CardHeader>
-              <CardTitle className="text-lg">
-                Trade between {trade.initiator.username} and {trade.receiver.username}
+          <Card key={trade.id} className="card-hover-effect card-gradient-border">
+            <CardHeader className="border-b border-border/50">
+              <CardTitle className="text-xl flex items-center gap-2">
+                <span className="text-primary">{trade.initiator.username}</span>
+                <span className="text-sm text-muted-foreground">↔️</span>
+                <span className="text-primary">{trade.receiver.username}</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <div className="text-center">
-                  <img
-                    src={trade.initiator_pokemon.pokemon_image_url}
-                    alt={trade.initiator_pokemon.pokemon_name}
-                    className="w-32 h-32 object-contain"
-                  />
-                  <p className="mt-2 font-medium capitalize">
+            <CardContent className="pt-6">
+              <div className="flex flex-col sm:flex-row items-center gap-8 justify-center">
+                <div className="text-center group">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-lg blur-xl group-hover:blur-2xl transition-all opacity-0 group-hover:opacity-70" />
+                    <img
+                      src={trade.initiator_pokemon.pokemon_image_url}
+                      alt={trade.initiator_pokemon.pokemon_name}
+                      className="w-40 h-40 object-contain relative z-10 group-hover:scale-110 transition-transform"
+                    />
+                  </div>
+                  <p className="mt-4 font-medium capitalize text-lg">
                     {trade.initiator_pokemon.pokemon_name}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    From: {trade.initiator.username}
+                    De: {trade.initiator.username}
                   </p>
                 </div>
 
-                <div className="text-2xl">↔️</div>
+                <div className="text-3xl text-primary/60">⇄</div>
 
-                <div className="text-center">
+                <div className="text-center group">
                   {trade.receiver_pokemon ? (
                     <>
-                      <img
-                        src={trade.receiver_pokemon.pokemon_image_url}
-                        alt={trade.receiver_pokemon.pokemon_name}
-                        className="w-32 h-32 object-contain"
-                      />
-                      <p className="mt-2 font-medium capitalize">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-lg blur-xl group-hover:blur-2xl transition-all opacity-0 group-hover:opacity-70" />
+                        <img
+                          src={trade.receiver_pokemon.pokemon_image_url}
+                          alt={trade.receiver_pokemon.pokemon_name}
+                          className="w-40 h-40 object-contain relative z-10 group-hover:scale-110 transition-transform"
+                        />
+                      </div>
+                      <p className="mt-4 font-medium capitalize text-lg">
                         {trade.receiver_pokemon.pokemon_name}
                       </p>
                     </>
                   ) : (
-                    <div className="w-32 h-32 flex items-center justify-center border-2 border-dashed rounded-lg">
-                      No Pokémon selected
+                    <div className="w-40 h-40 flex items-center justify-center border-2 border-dashed border-primary/20 rounded-lg">
+                      <span className="text-muted-foreground">Nenhum Pokémon selecionado</span>
                     </div>
                   )}
                   <p className="text-sm text-muted-foreground">
-                    From: {trade.receiver.username}
+                    De: {trade.receiver.username}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-4 flex justify-end gap-2">
+              <div className="mt-6 flex justify-end gap-2">
                 {trade.status === 'pending' && trade.receiver_user_id === user?.id && (
                   <>
                     <Button
                       variant="outline"
                       onClick={() => handleTradeAction(trade.id, 'reject')}
+                      className="hover:bg-destructive/10 hover:text-destructive"
                     >
-                      Reject
+                      Recusar
                     </Button>
                     <Button
                       onClick={() => handleTradeAction(trade.id, 'accept')}
+                      className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
                     >
-                      Accept
+                      Aceitar
                     </Button>
                   </>
                 )}
                 {trade.status !== 'pending' && (
-                  <span className={`px-3 py-1 rounded-full text-sm ${
+                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${
                     trade.status === 'accepted' 
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-red-100 text-red-800'
+                      ? 'bg-green-500/10 text-green-500'
+                      : 'bg-red-500/10 text-red-500'
                   }`}>
-                    {trade.status.charAt(0).toUpperCase() + trade.status.slice(1)}
+                    {trade.status === 'accepted' ? 'Aceita' : 'Recusada'}
                   </span>
                 )}
               </div>
@@ -177,8 +191,8 @@ export default function Trades() {
         ))}
 
         {trades.length === 0 && (
-          <div className="text-center text-muted-foreground py-8">
-            No trades found
+          <div className="text-center py-12 bg-accent/50 rounded-lg border border-border/50">
+            <p className="text-lg text-muted-foreground">Nenhuma troca encontrada</p>
           </div>
         )}
       </div>
