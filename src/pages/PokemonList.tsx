@@ -1,27 +1,35 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
 import { PokemonCard } from '@/components/PokemonCard';
 import { getPokemonDetails } from '@/lib/pokemon-api';
+import { Input } from '@/components/ui/input';
+import { Select, SelectTrigger, SelectValue, SelectItem, SelectContent } from '@/components/ui/select';
+
+interface PokemonSprites {
+  front_default: string;
+  front_shiny: string;
+  other: {
+    'official-artwork': {
+      front_default: string;
+      front_shiny: string;
+    };
+  };
+}
 
 interface Pokemon {
   id: number;
+  user_id: string;
   pokemon_name: string;
   pokemon_image_url: string;
+  types: string[];
+  sprites: PokemonSprites;
   is_shiny: boolean;
   is_legendary: boolean;
   is_mythical: boolean;
   count: number;
-  types?: string[];
+  created_at?: string;
 }
 
 export default function PokemonList() {
@@ -58,15 +66,48 @@ export default function PokemonList() {
                 return {
                   ...p,
                   types: details?.types?.map((t: any) => t.type.name) || [],
-                  pokemon_image_url: (details?.sprites as any)?.other?.['official-artwork']?.front_default || 
-                                   details?.sprites?.front_default
+                  sprites: {
+                    front_default: p.is_shiny
+                      ? (details?.sprites as any)?.other?.['official-artwork']?.front_shiny || 
+                        details?.sprites?.front_shiny
+                      : (details?.sprites as any)?.other?.['official-artwork']?.front_default || 
+                        details?.sprites?.front_default,
+                    front_shiny: p.is_shiny
+                      ? (details?.sprites as any)?.other?.['official-artwork']?.front_shiny || 
+                        details?.sprites?.front_shiny
+                      : (details?.sprites as any)?.other?.['official-artwork']?.front_default || 
+                        details?.sprites?.front_default,
+                    other: {
+                      'official-artwork': {
+                        front_default: p.is_shiny
+                          ? (details?.sprites as any)?.other?.['official-artwork']?.front_shiny || 
+                            details?.sprites?.front_shiny
+                          : (details?.sprites as any)?.other?.['official-artwork']?.front_default || 
+                            details?.sprites?.front_default,
+                        front_shiny: p.is_shiny
+                          ? (details?.sprites as any)?.other?.['official-artwork']?.front_shiny || 
+                            details?.sprites?.front_shiny
+                          : (details?.sprites as any)?.other?.['official-artwork']?.front_default || 
+                            details?.sprites?.front_default
+                      }
+                    }
+                  }
                 };
               } catch (error) {
                 console.error(`Erro ao buscar detalhes do pokémon ${p.pokemon_name}:`, error);
                 return {
                   ...p,
                   types: [],
-                  pokemon_image_url: '' // URL padrão ou placeholder
+                  sprites: {
+                    front_default: '',
+                    front_shiny: '',
+                    other: {
+                      'official-artwork': {
+                        front_default: '',
+                        front_shiny: ''
+                      }
+                    }
+                  }
                 };
               }
             })
@@ -94,8 +135,8 @@ export default function PokemonList() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[50vh]">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     );
   }
@@ -127,7 +168,7 @@ export default function PokemonList() {
           <PokemonCard
             key={p.id}
             name={p.pokemon_name}
-            imageUrl={p.pokemon_image_url}
+            imageUrl={p.sprites.front_default}
             types={p.types || []}
             isShiny={p.is_shiny}
             isLegendary={p.is_legendary}
