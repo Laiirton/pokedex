@@ -51,7 +51,7 @@ export default function Layout() {
             <div className="flex items-center">
               <Button
                 variant="ghost"
-                onClick={() => logout()}
+                onClick={logout}
               >
                 Logout
               </Button>
