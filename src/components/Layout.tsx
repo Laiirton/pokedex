@@ -1,7 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, Outlet } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Gamepad2, ListFilter, RefreshCcw, User, CircleDot } from 'lucide-react';
+import { Gamepad2, ListFilter, RefreshCcw, User, CircleDot, Trophy } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 export default function Layout() {
@@ -21,6 +21,11 @@ export default function Layout() {
       name: 'Capturar',
       href: '/catch',
       icon: CircleDot
+    },
+    {
+      name: 'Ranking',
+      href: '/ranking',
+      icon: Trophy
     },
   ];
 
