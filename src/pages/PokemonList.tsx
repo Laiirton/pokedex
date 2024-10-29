@@ -33,27 +33,48 @@ export default function PokemonList() {
 
   useEffect(() => {
     async function fetchPokemon() {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('pokemon_generated')
           .select('*')
-          .eq('user_id', user?.id);
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('Erro ao buscar pokémon do Supabase:', error);
+          setLoading(false);
+          return;
+        }
 
         if (data) {
-          // Fetch additional details from PokéAPI for each Pokemon
           const enrichedData = await Promise.all(
             data.map(async (p) => {
-              const details = await getPokemonDetails(p.pokemon_name.toLowerCase());
-              return {
-                ...p,
-                types: details?.types.map((t) => t.type.name) || []
-              };
+              try {
+                const details = await getPokemonDetails(p.pokemon_name.toLowerCase());
+                return {
+                  ...p,
+                  types: details?.types?.map((t: any) => t.type.name) || [],
+                  pokemon_image_url: (details?.sprites as any)?.other?.['official-artwork']?.front_default || 
+                                   details?.sprites?.front_default
+                };
+              } catch (error) {
+                console.error(`Erro ao buscar detalhes do pokémon ${p.pokemon_name}:`, error);
+                return {
+                  ...p,
+                  types: [],
+                  pokemon_image_url: '' // URL padrão ou placeholder
+                };
+              }
             })
           );
-          setPokemon(enrichedData);
+          setPokemon(enrichedData.filter(p => p !== null));
         }
       } catch (error) {
-        console.error('Error fetching pokemon:', error);
+        console.error('Erro ao buscar pokémon:', error);
       } finally {
         setLoading(false);
       }

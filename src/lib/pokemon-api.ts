@@ -16,28 +16,18 @@ interface PokemonDetails {
   is_mythical: boolean;
 }
 
-export async function getPokemonDetails(nameOrId: string | number): Promise<PokemonDetails | null> {
+export async function getPokemonDetails(pokemonName: string): Promise<PokemonDetails | null> {
   try {
-    const [pokemonRes, speciesRes] = await Promise.all([
-      fetch(`https://pokeapi.co/api/v2/pokemon/${nameOrId}`),
-      fetch(`https://pokeapi.co/api/v2/pokemon-species/${nameOrId}`)
-    ]);
-
-    if (!pokemonRes.ok || !speciesRes.ok) {
-      throw new Error('Failed to fetch Pokemon data');
+    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName.toLowerCase()}`);
+    
+    if (!response.ok) {
+      throw new Error(`Erro ao buscar pokémon: ${response.status}`);
     }
-
-    const pokemonData = await pokemonRes.json();
-    const speciesData = await speciesRes.json();
-
-    return {
-      ...pokemonData,
-      is_legendary: speciesData.is_legendary,
-      is_mythical: speciesData.is_mythical
-    };
+    
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error('Error fetching Pokemon:', error);
-    toast.error('Failed to fetch Pokemon data');
+    console.error('Erro na API do Pokémon:', error);
     return null;
   }
 }
