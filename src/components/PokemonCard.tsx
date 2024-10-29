@@ -1,13 +1,14 @@
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface PokemonCardProps {
   name: string;
   imageUrl: string;
   types: string[];
-  isShiny?: boolean;
-  isLegendary?: boolean;
-  isMythical?: boolean;
-  count?: number;
+  isShiny: boolean;
+  isLegendary: boolean;
+  isMythical: boolean;
+  count: number;
 }
 
 export function PokemonCard({
@@ -28,17 +29,32 @@ export function PokemonCard({
     : 'bg-accent/50';
 
   return (
-    <Card className={`overflow-hidden hover:shadow-lg transition-shadow duration-300 ${cardClass} backdrop-blur-sm`}>
+    <Card className={`overflow-hidden hover:shadow-lg transition-shadow duration-300 ${cardClass} backdrop-blur-sm relative group`}>
+      {count > 1 && (
+        <div className="absolute top-2 right-2 z-10">
+          <Badge 
+            variant="secondary" 
+            className="bg-background/80 backdrop-blur-sm font-bold text-primary"
+          >
+            x{count}
+          </Badge>
+        </div>
+      )}
+      
       <CardContent className="p-4">
-        <div className="aspect-square relative rounded-lg overflow-hidden bg-accent/30 mb-4">
+        <div className="aspect-square relative rounded-lg overflow-hidden bg-accent/30 mb-4 group-hover:scale-105 transition-transform duration-300">
+          <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           <img
             src={imageUrl}
             alt={name}
             className="object-contain w-full h-full transform hover:scale-110 transition-transform duration-300"
           />
         </div>
+        
         <div className="space-y-2">
-          <h3 className="font-semibold capitalize text-lg text-center">{name}</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold capitalize text-lg">{name}</h3>
+          </div>
           
           <div className="flex flex-wrap gap-1 justify-center">
             {types.map((type) => (
@@ -50,27 +66,21 @@ export function PokemonCard({
 
           <div className="flex flex-wrap gap-1 justify-center mt-2">
             {isShiny && (
-              <span className="px-2 py-1 rounded-full text-xs bg-yellow-500/20 text-yellow-300">
+              <Badge variant="outline" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/50">
                 ✨ Shiny
-              </span>
+              </Badge>
             )}
             {isLegendary && (
-              <span className="px-2 py-1 rounded-full text-xs bg-purple-500/20 text-purple-300">
-                👑 Legendary
-              </span>
+              <Badge variant="outline" className="bg-purple-500/20 text-purple-300 border-purple-500/50">
+                👑 Lendário
+              </Badge>
             )}
             {isMythical && (
-              <span className="px-2 py-1 rounded-full text-xs bg-blue-500/20 text-blue-300">
-                🌟 Mythical
-              </span>
+              <Badge variant="outline" className="bg-blue-500/20 text-blue-300 border-blue-500/50">
+                🌟 Mítico
+              </Badge>
             )}
           </div>
-
-          {count !== undefined && count > 1 && (
-            <p className="text-sm text-center text-muted-foreground mt-2">
-              Quantidade: {count}
-            </p>
-          )}
         </div>
       </CardContent>
     </Card>
