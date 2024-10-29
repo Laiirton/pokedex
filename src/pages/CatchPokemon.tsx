@@ -14,6 +14,7 @@ interface CapturedPokemon {
   isLegendary: boolean;
   isMythical: boolean;
   count: number;
+  types: string[];
 }
 
 export default function CatchPokemon() {
@@ -53,12 +54,23 @@ export default function CatchPokemon() {
       const details = await getPokemonDetails(pokemonName);
       if (!details) throw new Error('Falha ao buscar detalhes do Pokémon');
 
+      const types = details.types.map((type: any) => type.type.name);
+      const isShiny = Math.random() < 0.01;
+      
+      // Selecionar a imagem correta baseada no status shiny
+      const pokemonImage = isShiny 
+        ? details.sprites.front_shiny 
+        : details.sprites.front_default;
+
       if (existingPokemon) {
-        // Atualizar contagem se o Pokémon já existir
         const newCount = existingPokemon.count + 1;
         const { error } = await supabase
           .from('pokemon_generated')
-          .update({ count: newCount })
+          .update({ 
+            count: newCount,
+            pokemon_image_url: pokemonImage, // Atualizar a imagem se for shiny
+            is_shiny: isShiny 
+          })
           .eq('id', existingPokemon.id);
 
         if (error) {
@@ -66,22 +78,28 @@ export default function CatchPokemon() {
           return;
         }
 
-        // Atualizar o estado local
         setCapturedPokemon((prev) => {
           const exists = prev.some(p => p.name === pokemonName);
           if (exists) {
             return prev.map(p => 
-              p.name === pokemonName ? { ...p, count: newCount } : p
+              p.name === pokemonName 
+                ? { 
+                    ...p, 
+                    count: newCount,
+                    imageUrl: pokemonImage, // Atualizar a imagem
+                    isShiny: isShiny 
+                  } 
+                : p
             );
           } else {
-            // Adicionar ao estado se não existir na lista local
             return [...prev, {
               name: pokemonName,
-              imageUrl: existingPokemon.pokemon_image_url,
-              isShiny: existingPokemon.is_shiny,
+              imageUrl: pokemonImage,
+              isShiny,
               isLegendary: existingPokemon.is_legendary,
               isMythical: existingPokemon.is_mythical,
-              count: newCount
+              count: newCount,
+              types
             }];
           }
         });
@@ -91,11 +109,10 @@ export default function CatchPokemon() {
       }
 
       // Novo Pokémon
-      const isShiny = Math.random() < 0.01;
       const { error } = await supabase.from('pokemon_generated').insert({
         user_id: user.id,
         pokemon_name: pokemonName,
-        pokemon_image_url: details.sprites.front_default,
+        pokemon_image_url: pokemonImage,
         is_shiny: isShiny,
         is_legendary: details.is_legendary || false,
         is_mythical: details.is_mythical || false,
@@ -104,14 +121,14 @@ export default function CatchPokemon() {
 
       if (error) throw error;
 
-      // Adicionar novo Pokémon ao estado
       setCapturedPokemon((prev) => [...prev, {
         name: pokemonName,
-        imageUrl: details.sprites.front_default,
+        imageUrl: pokemonImage,
         isShiny,
         isLegendary: details.is_legendary || false,
         isMythical: details.is_mythical || false,
-        count: 1
+        count: 1,
+        types
       }]);
 
       if (isShiny) {
@@ -200,7 +217,7 @@ export default function CatchPokemon() {
                 key={index}
                 name={pokemon.name}
                 imageUrl={pokemon.imageUrl}
-                types={[]}
+                types={pokemon.types}
                 isShiny={pokemon.isShiny}
                 isLegendary={pokemon.isLegendary}
                 isMythical={pokemon.isMythical}
