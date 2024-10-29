@@ -1,7 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, Outlet } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Gamepad2, ListFilter, RefreshCcw, User } from 'lucide-react';
+import { Gamepad2, ListFilter, RefreshCcw, User, CircleDot } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 export default function Layout() {
@@ -18,9 +18,9 @@ export default function Layout() {
     { name: 'Trades', href: '/trades', icon: RefreshCcw },
     { name: 'Companion', href: '/companion', icon: User },
     {
-      title: 'Capturar',
+      name: 'Capturar',
       href: '/catch',
-      icon: User
+      icon: CircleDot
     },
   ];
 
