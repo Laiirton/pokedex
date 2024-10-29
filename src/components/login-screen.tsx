@@ -5,12 +5,14 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import pokeball from '@/assets/icon/pokeball_gif.gif'
+import { useAuth } from "@/contexts/AuthContext"
 
 export function LoginScreen() {
   const [isFocused, setIsFocused] = useState(false)
   const [code, setCode] = useState("")
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -21,7 +23,7 @@ export function LoginScreen() {
 
     setLoading(true)
     try {
-      // Aqui você pode adicionar a lógica de login
+      await login(code)
       navigate("/dashboard")
       toast.success("Bem-vindo de volta, treinador!")
     } catch (error) {
