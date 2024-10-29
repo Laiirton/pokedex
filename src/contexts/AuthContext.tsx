@@ -27,11 +27,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function checkUser() {
     try {
       const storedUser = localStorage.getItem('pokemon_user');
+      
       if (storedUser) {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        
+        // Verifica se o usuário ainda existe no banco
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', parsedUser.id)
+          .single();
+
+        if (error) {
+          console.error('Erro ao verificar usuário:', error);
+          handleLogout();
+          return;
+        }
+
+        if (!data) {
+          handleLogout();
+          return;
+        }
+
+        // Atualiza os dados do usuário caso tenha mudado algo no banco
+        if (JSON.stringify(data) !== storedUser) {
+          localStorage.setItem('pokemon_user', JSON.stringify(data));
+        }
+        
+        setUser(data);
       }
     } catch (error) {
-      console.error('Error checking user:', error);
+      console.error('Erro ao verificar usuário:', error);
+      handleLogout();
     } finally {
       setLoading(false);
     }
@@ -46,19 +73,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (error) throw error;
-      if (!data) throw new Error('User not found');
+      if (!data) throw new Error('Usuário não encontrado');
 
-      setUser(data);
+      // Salva a sessão do usuário
+      const session = {
+        user: data,
+        session_id: Date.now(),
+        last_activity: new Date().toISOString()
+      };
+
       localStorage.setItem('pokemon_user', JSON.stringify(data));
+      localStorage.setItem('pokemon_session', JSON.stringify(session));
+      setUser(data);
+
     } catch (error) {
-      console.error('Error logging in:', error);
+      console.error('Erro ao fazer login:', error);
       throw error;
     }
   }
 
-  async function logout() {
+  function handleLogout() {
     localStorage.removeItem('pokemon_user');
+    localStorage.removeItem('pokemon_session');
     setUser(null);
+  }
+
+  async function logout() {
+    try {
+      handleLogout();
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+      throw error;
+    }
   }
 
   return (
