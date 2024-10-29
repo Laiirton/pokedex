@@ -51,43 +51,75 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Welcome, {user?.username}!</h1>
+    <div className="space-y-8">
+      <div className="page-header">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          Bem-vindo, {user?.username}!
+        </h1>
+      </div>
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Pokémon</CardTitle>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="card-hover-effect card-gradient-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total de Pokémon
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalPokemon || 0}</div>
+            <div className="text-3xl font-bold stats-value">
+              {stats?.totalPokemon || 0}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              Pokémon capturados
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Shiny Pokémon</CardTitle>
+        <Card className="card-hover-effect card-gradient-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Pokémon Shiny
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-500">{stats?.shinyCount || 0}</div>
+            <div className="text-3xl font-bold text-yellow-500">
+              {stats?.shinyCount || 0}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              ✨ Raros e brilhantes
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Legendary Pokémon</CardTitle>
+        <Card className="card-hover-effect card-gradient-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Pokémon Lendários
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-500">{stats?.legendaryCount || 0}</div>
+            <div className="text-3xl font-bold text-purple-500">
+              {stats?.legendaryCount || 0}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              👑 Criaturas lendárias
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Mythical Pokémon</CardTitle>
+        <Card className="card-hover-effect card-gradient-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Pokémon Míticos
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-500">{stats?.mythicalCount || 0}</div>
+            <div className="text-3xl font-bold text-blue-500">
+              {stats?.mythicalCount || 0}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              🌟 Poder ancestral
+            </div>
           </CardContent>
         </Card>
       </div>
