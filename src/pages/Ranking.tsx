@@ -78,30 +78,42 @@ export default function Ranking() {
   }
 
   const RankingTable = ({ data, title, icon: Icon }: { data: RankingUser[], title: string, icon: any }) => (
-    <Card>
+    <Card className="card-gradient-border">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Icon className="h-5 w-5" />
-          {title}
+        <CardTitle className="flex items-center gap-3 text-xl">
+          <Icon className="h-6 w-6 text-primary" />
+          <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            {title}
+          </span>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-16">Posição</TableHead>
+            <TableRow className="hover:bg-accent/50">
+              <TableHead className="w-24">Posição</TableHead>
               <TableHead>Treinador</TableHead>
               <TableHead className="text-right">Total</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.map((user, index) => (
-              <TableRow key={user.user_id}>
-                <TableCell>
-                  {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+              <TableRow key={user.user_id} className="hover:bg-accent/50 transition-colors">
+                <TableCell className="font-medium">
+                  {index === 0 ? (
+                    <span className="text-yellow-500">🥇 1º</span>
+                  ) : index === 1 ? (
+                    <span className="text-gray-400">🥈 2º</span>
+                  ) : index === 2 ? (
+                    <span className="text-amber-600">🥉 3º</span>
+                  ) : (
+                    <span className="text-muted-foreground">#{index + 1}</span>
+                  )}
                 </TableCell>
-                <TableCell>{user.username}</TableCell>
-                <TableCell className="text-right">{user.total}</TableCell>
+                <TableCell className="font-medium">{user.username}</TableCell>
+                <TableCell className="text-right font-bold stats-value">
+                  {user.total}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -111,15 +123,19 @@ export default function Ranking() {
   );
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Ranking de Treinadores</h1>
+    <div className="space-y-8">
+      <div className="page-header">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          Ranking de Treinadores
+        </h1>
+      </div>
       
-      <Tabs defaultValue="total" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="total">Total</TabsTrigger>
-          <TabsTrigger value="shiny">Shiny</TabsTrigger>
-          <TabsTrigger value="legendary">Lendários</TabsTrigger>
-          <TabsTrigger value="mythical">Míticos</TabsTrigger>
+      <Tabs defaultValue="total" className="space-y-6">
+        <TabsList className="grid grid-cols-4 max-w-[600px] mx-auto">
+          <TabsTrigger value="total" className="data-[state=active]:bg-primary/20">Total</TabsTrigger>
+          <TabsTrigger value="shiny" className="data-[state=active]:bg-yellow-500/20">Shiny</TabsTrigger>
+          <TabsTrigger value="legendary" className="data-[state=active]:bg-purple-500/20">Lendários</TabsTrigger>
+          <TabsTrigger value="mythical" className="data-[state=active]:bg-blue-500/20">Míticos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="total">
