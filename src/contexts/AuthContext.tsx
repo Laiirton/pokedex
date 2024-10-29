@@ -50,35 +50,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
         localStorage.setItem('pokemon_session', JSON.stringify(updatedSession));
         
-        // Resto da verificação do usuário permanece igual
-        const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', parsedUser.id)
-          .single();
-
-        if (error || !data) {
-          handleLogout();
-          return;
-        }
-
-        if (JSON.stringify(data) !== storedUser) {
-          localStorage.setItem('pokemon_user', JSON.stringify(data));
-        }
-        
-        setUser(data);
+        setUser(parsedUser);
+        setIsLoading(false);
+        return;
       }
+      
+      setIsLoading(false);
     } catch (error) {
       console.error('Erro ao verificar usuário:', error);
       handleLogout();
-    } finally {
       setIsLoading(false);
     }
   }
 
   async function login(code: string) {
     try {
-      // Verifica o código na tabela verification_codes
       const { data: verificationData, error: verificationError } = await supabase
         .from('verification_codes')
         .select('*, users(*)')
@@ -91,7 +77,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error('Código inválido ou expirado');
       }
 
-      // Marca o código como usado
       await supabase
         .from('verification_codes')
         .update({ used: true })
@@ -99,11 +84,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const userData = verificationData.users;
 
-      // Salva a sessão do usuário
+      // Salva a sessão do usuário com timestamp
       const session = {
-        user: userData,
+        user_id: userData.id,
         session_id: Date.now(),
-        last_activity: new Date().toISOString()
+        last_activity: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 horas
       };
 
       localStorage.setItem('pokemon_user', JSON.stringify(userData));
