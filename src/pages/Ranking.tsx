@@ -33,93 +33,34 @@ export default function Ranking() {
     try {
       // Total Pokémon Ranking
       const { data: totalData } = await supabase
-        .from('pokemon_generated')
-        .select(`
-          user_id,
-          count,
-          users!inner (
-            username
-          )
-        `)
-        .order('count', { ascending: false });
+        .rpc('get_total_ranking');
 
       if (totalData) {
-        setTotalPokemon(
-          totalData.map((item: any) => ({
-            username: item.users.username,
-            total: parseInt(item.count),
-            user_id: item.user_id,
-          }))
-        );
+        setTotalPokemon(totalData);
       }
 
       // Shiny Pokémon Ranking
       const { data: shinyData } = await supabase
-        .from('pokemon_generated')
-        .select(`
-          user_id,
-          count,
-          users!inner (
-            username
-          )
-        `)
-        .eq('is_shiny', true)
-        .order('count', { ascending: false });
+        .rpc('get_shiny_ranking');
 
       if (shinyData) {
-        setShinyPokemon(
-          shinyData.map((item: any) => ({
-            username: item.users.username,
-            total: parseInt(item.count),
-            user_id: item.user_id,
-          }))
-        );
+        setShinyPokemon(shinyData);
       }
 
       // Legendary Pokémon Ranking
       const { data: legendaryData } = await supabase
-        .from('pokemon_generated')
-        .select(`
-          user_id,
-          count,
-          users!inner (
-            username
-          )
-        `)
-        .eq('is_legendary', true)
-        .order('count', { ascending: false });
+        .rpc('get_legendary_ranking');
 
       if (legendaryData) {
-        setLegendaryPokemon(
-          legendaryData.map((item: any) => ({
-            username: item.users.username,
-            total: parseInt(item.count),
-            user_id: item.user_id,
-          }))
-        );
+        setLegendaryPokemon(legendaryData);
       }
 
       // Mythical Pokémon Ranking
       const { data: mythicalData } = await supabase
-        .from('pokemon_generated')
-        .select(`
-          user_id,
-          count,
-          users!inner (
-            username
-          )
-        `)
-        .eq('is_mythical', true)
-        .order('count', { ascending: false });
+        .rpc('get_mythical_ranking');
 
       if (mythicalData) {
-        setMythicalPokemon(
-          mythicalData.map((item: any) => ({
-            username: item.users.username,
-            total: parseInt(item.count),
-            user_id: item.user_id,
-          }))
-        );
+        setMythicalPokemon(mythicalData);
       }
     } catch (error) {
       console.error('Erro ao buscar rankings:', error);
