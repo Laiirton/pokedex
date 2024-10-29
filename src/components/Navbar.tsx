@@ -1,11 +1,11 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogOut, Home, PokemonIcon, Repeat2, User } from 'lucide-react';
+import { LogOut, Home, Gamepad2, Repeat2, User } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
-  { name: 'Pokémon', href: '/pokemon', icon: PokemonIcon },
+  { name: 'Pokémon', href: '/pokemon', icon: Gamepad2 },
   { name: 'Trades', href: '/trades', icon: Repeat2 },
   { name: 'Companion', href: '/companion', icon: User },
 ];
