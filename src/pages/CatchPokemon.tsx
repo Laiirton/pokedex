@@ -48,34 +48,50 @@ export default function CatchPokemon() {
   async function catchPokemon(pokemonName: string) {
     if (!user?.id) return;
 
-    const existingPokemon = await checkExistingPokemon(pokemonName);
-    if (existingPokemon) {
-      // Atualizar contagem se o Pokémon já existir
-      const { error } = await supabase
-        .from('pokemon_generated')
-        .update({ count: existingPokemon.count + 1 })
-        .eq('id', existingPokemon.id);
-
-      if (error) {
-        toast.error('Erro ao atualizar contagem do Pokémon');
-        return;
-      }
-
-      setCapturedPokemon((prev) =>
-        prev.map((p) =>
-          p.name === pokemonName ? { ...p, count: existingPokemon.count + 1 } : p
-        )
-      );
-
-      toast.success(`Contagem de ${pokemonName} atualizada!`);
-      return;
-    }
-
     try {
+      const existingPokemon = await checkExistingPokemon(pokemonName);
       const details = await getPokemonDetails(pokemonName);
       if (!details) throw new Error('Falha ao buscar detalhes do Pokémon');
 
-      const isShiny = Math.random() < 0.01; // 1% chance de ser shiny
+      if (existingPokemon) {
+        // Atualizar contagem se o Pokémon já existir
+        const newCount = existingPokemon.count + 1;
+        const { error } = await supabase
+          .from('pokemon_generated')
+          .update({ count: newCount })
+          .eq('id', existingPokemon.id);
+
+        if (error) {
+          toast.error('Erro ao atualizar contagem do Pokémon');
+          return;
+        }
+
+        // Atualizar o estado local
+        setCapturedPokemon((prev) => {
+          const exists = prev.some(p => p.name === pokemonName);
+          if (exists) {
+            return prev.map(p => 
+              p.name === pokemonName ? { ...p, count: newCount } : p
+            );
+          } else {
+            // Adicionar ao estado se não existir na lista local
+            return [...prev, {
+              name: pokemonName,
+              imageUrl: existingPokemon.pokemon_image_url,
+              isShiny: existingPokemon.is_shiny,
+              isLegendary: existingPokemon.is_legendary,
+              isMythical: existingPokemon.is_mythical,
+              count: newCount
+            }];
+          }
+        });
+
+        toast.success(`${pokemonName} foi capturado novamente! Total: ${newCount}`);
+        return;
+      }
+
+      // Novo Pokémon
+      const isShiny = Math.random() < 0.01;
       const { error } = await supabase.from('pokemon_generated').insert({
         user_id: user.id,
         pokemon_name: pokemonName,
@@ -88,17 +104,15 @@ export default function CatchPokemon() {
 
       if (error) throw error;
 
-      setCapturedPokemon((prev) => [
-        ...prev,
-        {
-          name: pokemonName,
-          imageUrl: details.sprites.front_default,
-          isShiny,
-          isLegendary: details.is_legendary || false,
-          isMythical: details.is_mythical || false,
-          count: 1
-        }
-      ]);
+      // Adicionar novo Pokémon ao estado
+      setCapturedPokemon((prev) => [...prev, {
+        name: pokemonName,
+        imageUrl: details.sprites.front_default,
+        isShiny,
+        isLegendary: details.is_legendary || false,
+        isMythical: details.is_mythical || false,
+        count: 1
+      }]);
 
       if (isShiny) {
         toast.success(`✨ Capturou um Shiny ${pokemonName}! ✨`);
