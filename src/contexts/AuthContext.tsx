@@ -18,7 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     checkUser();
@@ -27,29 +27,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function checkUser() {
     try {
       const storedUser = localStorage.getItem('pokemon_user');
+      const storedSession = localStorage.getItem('pokemon_session');
       
-      if (storedUser) {
+      if (storedUser && storedSession) {
         const parsedUser = JSON.parse(storedUser);
+        const parsedSession = JSON.parse(storedSession);
         
-        // Verifica se o usuário ainda existe no banco
+        // Verifica se a sessão não expirou (24 horas)
+        const lastActivity = new Date(parsedSession.last_activity).getTime();
+        const now = new Date().getTime();
+        const hoursDiff = (now - lastActivity) / (1000 * 60 * 60);
+        
+        if (hoursDiff > 24) {
+          handleLogout();
+          return;
+        }
+
+        // Atualiza o último acesso
+        const updatedSession = {
+          ...parsedSession,
+          last_activity: new Date().toISOString()
+        };
+        localStorage.setItem('pokemon_session', JSON.stringify(updatedSession));
+        
+        // Resto da verificação do usuário permanece igual
         const { data, error } = await supabase
           .from('users')
           .select('*')
           .eq('id', parsedUser.id)
           .single();
 
-        if (error) {
-          console.error('Erro ao verificar usuário:', error);
+        if (error || !data) {
           handleLogout();
           return;
         }
 
-        if (!data) {
-          handleLogout();
-          return;
-        }
-
-        // Atualiza os dados do usuário caso tenha mudado algo no banco
         if (JSON.stringify(data) !== storedUser) {
           localStorage.setItem('pokemon_user', JSON.stringify(data));
         }
@@ -60,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Erro ao verificar usuário:', error);
       handleLogout();
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }
 
@@ -108,7 +120,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      login, 
+      logout, 
+      isLoading
+    }}>
       {children}
     </AuthContext.Provider>
   );
