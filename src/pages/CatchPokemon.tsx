@@ -17,22 +17,108 @@ interface CapturedPokemon {
   types: string[];
 }
 
+interface UserLimits {
+  captures_per_hour: number;
+  last_capture_time: string;
+  captures_since_last_reset: number;
+}
+
 export default function CatchPokemon() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [capturing, setCapturing] = useState(false);
   const [availablePokemon, setAvailablePokemon] = useState<{ name: string; url: string }[]>([]);
   const [capturedPokemon, setCapturedPokemon] = useState<CapturedPokemon[]>([]);
+  const [userLimits, setUserLimits] = useState<UserLimits | null>(null);
+  const [remainingCaptures, setRemainingCaptures] = useState(0);
+  const [nextResetTime, setNextResetTime] = useState<Date | null>(null);
 
   useEffect(() => {
     fetchAvailablePokemon();
-  }, []);
+    if (user?.id) {
+      fetchUserLimits();
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (userLimits) {
+      updateRemainingCaptures();
+      const interval = setInterval(updateRemainingCaptures, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [userLimits]);
 
   async function fetchAvailablePokemon() {
     setLoading(true);
     const pokemon = await getAllPokemon();
     setAvailablePokemon(pokemon);
     setLoading(false);
+  }
+
+  async function fetchUserLimits() {
+    const { data, error } = await supabase
+      .from('user_capture_limits')
+      .select('*')
+      .eq('user_id', user?.id)
+      .single();
+
+    if (error) {
+      toast.error('Erro ao carregar limites de captura');
+      return;
+    }
+
+    setUserLimits(data);
+    updateRemainingCaptures();
+  }
+
+  function updateRemainingCaptures() {
+    if (!userLimits) return;
+
+    const lastCapture = new Date(userLimits.last_capture_time);
+    const now = new Date();
+    const hoursSinceLastCapture = (now.getTime() - lastCapture.getTime()) / (1000 * 60 * 60);
+    
+    // Resetar contagem se passou 1 hora
+    if (hoursSinceLastCapture >= 1) {
+      setRemainingCaptures(userLimits.captures_per_hour);
+      setNextResetTime(null);
+    } else {
+      const remaining = userLimits.captures_per_hour - userLimits.captures_since_last_reset;
+      setRemainingCaptures(Math.max(0, remaining));
+      
+      // Calcular próximo reset
+      const nextReset = new Date(lastCapture.getTime() + (60 * 60 * 1000));
+      setNextResetTime(nextReset);
+    }
+  }
+
+  async function updateCaptureCount() {
+    if (!user?.id || !userLimits) return;
+
+    const now = new Date();
+    const lastCapture = new Date(userLimits.last_capture_time);
+    const hoursSinceLastCapture = (now.getTime() - lastCapture.getTime()) / (1000 * 60 * 60);
+
+    const newCapturesSinceReset = hoursSinceLastCapture >= 1 ? 1 : userLimits.captures_since_last_reset + 1;
+
+    const { error } = await supabase
+      .from('user_capture_limits')
+      .update({
+        last_capture_time: now.toISOString(),
+        captures_since_last_reset: newCapturesSinceReset
+      })
+      .eq('user_id', user.id);
+
+    if (error) {
+      toast.error('Erro ao atualizar limites de captura');
+      return;
+    }
+
+    setUserLimits(prev => prev ? {
+      ...prev,
+      last_capture_time: now.toISOString(),
+      captures_since_last_reset: newCapturesSinceReset
+    } : null);
   }
 
   async function checkExistingPokemon(pokemonName: string) {
@@ -145,12 +231,18 @@ export default function CatchPokemon() {
   }
 
   async function catchSinglePokemon() {
-    if (!user?.id || capturing) return;
+    if (!user?.id || capturing || remainingCaptures <= 0) return;
+
+    if (remainingCaptures <= 0) {
+      toast.error('Você atingiu o limite de capturas por hora!');
+      return;
+    }
 
     setCapturing(true);
     try {
       const randomPokemon = availablePokemon[Math.floor(Math.random() * availablePokemon.length)];
       await catchPokemon(randomPokemon.name);
+      await updateCaptureCount();
     } finally {
       setCapturing(false);
     }
@@ -159,12 +251,21 @@ export default function CatchPokemon() {
   async function catchMultiplePokemon() {
     if (!user?.id || capturing) return;
 
+    const captureAmount = Math.min(10, remainingCaptures);
+    if (captureAmount <= 0) {
+      toast.error('Você atingiu o limite de capturas por hora!');
+      return;
+    }
+
     setCapturing(true);
     try {
-      const randomPokemon = availablePokemon.sort(() => Math.random() - 0.5).slice(0, 10);
+      const randomPokemon = availablePokemon
+        .sort(() => Math.random() - 0.5)
+        .slice(0, captureAmount);
 
       for (const pokemon of randomPokemon) {
         await catchPokemon(pokemon.name);
+        await updateCaptureCount();
       }
     } finally {
       setCapturing(false);
@@ -183,6 +284,14 @@ export default function CatchPokemon() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Capturar Pokémon</h1>
+        <div className="text-sm text-muted-foreground">
+          Capturas restantes: {remainingCaptures}
+          {nextResetTime && (
+            <div>
+              Próximo reset em: {Math.ceil((nextResetTime.getTime() - new Date().getTime()) / (1000 * 60))} minutos
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex justify-center gap-4">
