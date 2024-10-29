@@ -1,67 +1,61 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
-import { Gamepad2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Login() {
-  const [identifier, setIdentifier] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user, loading } = useAuth();
   const navigate = useNavigate();
+  const [identifier, setIdentifier] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  async function handleLogin(e: React.FormEvent) {
+  // Se já estiver logado, redireciona para o dashboard
+  if (user && !loading) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
+    if (!identifier.trim()) return;
 
+    setIsLoading(true);
     try {
       await login(identifier);
       navigate('/dashboard');
-      toast.success('Welcome back, trainer!');
     } catch (error) {
-      toast.error('Failed to login. Please check your username or phone number.');
+      toast.error('Erro ao fazer login. Verifique suas credenciais.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }
 
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1613771404784-3a5686aa2be3')] bg-cover bg-center">
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
-      <Card className="w-full max-w-md relative z-10 bg-card/50 backdrop-blur-md border-primary/20">
-        <CardHeader className="space-y-1 flex flex-col items-center">
-          <div className="w-16 h-16 bg-primary/10 backdrop-blur-md rounded-full flex items-center justify-center mb-4 border border-primary/20">
-            <Gamepad2 className="w-8 h-8 text-primary" />
-          </div>
-          <CardTitle className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-            Pokémon Manager
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Input
-                type="text"
-                placeholder="Username or Phone Number"
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                className="bg-background/50 backdrop-blur-md border-primary/20"
-                required
-              />
-            </div>
-            <Button
-              type="submit"
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-              disabled={loading}
-            >
-              {loading ? 'Logging in...' : 'Start Your Journey'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+    <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="w-full max-w-md space-y-8 p-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">Login</h1>
+          <p className="text-muted-foreground">Entre com seu username ou telefone</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Input
+            type="text"
+            placeholder="Username ou telefone"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            disabled={isLoading}
+          />
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? 'Entrando...' : 'Entrar'}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
