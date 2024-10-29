@@ -47,7 +47,7 @@ export default function Login() {
             <Gamepad2 className="w-8 h-8 text-primary" />
           </div>
           <CardTitle className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-            PoggerDex Manager
+            PoggerDex
           </CardTitle>
         </CardHeader>
         <CardContent>
