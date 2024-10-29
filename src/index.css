@@ -55,6 +55,10 @@
     --type-steel: 184, 184, 208;
     --type-fairy: 238, 153, 172;
   }
+
+  body {
+    @apply bg-gradient-to-b from-background to-accent/20 min-h-screen;
+  }
 }
 
 @layer base {
@@ -89,3 +93,41 @@
 .type-dark { background-color: rgb(var(--type-dark)); }
 .type-steel { background-color: rgb(var(--type-steel)); }
 .type-fairy { background-color: rgb(var(--type-fairy)); }
+
+@layer components {
+  .page-header {
+    @apply relative pb-4 mb-6;
+  }
+
+  .page-header::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-32 h-1 bg-gradient-to-r from-primary/80 to-primary/20 rounded-full;
+  }
+
+  .card-hover-effect {
+    @apply relative overflow-hidden transition-all duration-300 hover:shadow-xl
+    hover:shadow-primary/10 hover:-translate-y-1 hover:bg-accent/50;
+  }
+
+  .card-gradient-border {
+    @apply relative bg-card border border-primary/20 rounded-lg;
+    background-image: linear-gradient(to right, hsl(var(--primary) / 0.1), transparent);
+  }
+
+  .stats-value {
+    @apply bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
