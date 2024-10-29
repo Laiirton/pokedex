@@ -8,7 +8,7 @@ import { Gamepad2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Login() {
-  const [identifier, setIdentifier] = useState('');
+  const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, user, isLoading } = useAuth();
   const navigate = useNavigate();
@@ -28,11 +28,11 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(identifier);
+      await login(code);
       navigate('/dashboard');
-      toast.success('Welcome back, trainer!');
+      toast.success('Bem-vindo de volta, treinador!');
     } catch (error) {
-      toast.error('Failed to login. Please check your username or phone number.');
+      toast.error('Código inválido ou expirado. Por favor, tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -55,11 +55,12 @@ export default function Login() {
             <div className="space-y-2">
               <Input
                 type="text"
-                placeholder="Username or Phone Number"
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder="Digite seu código de acesso"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
                 className="bg-background/50 backdrop-blur-md border-primary/20"
                 required
+                maxLength={6}
               />
             </div>
             <Button
@@ -67,7 +68,7 @@ export default function Login() {
               className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
               disabled={loading}
             >
-              {loading ? 'Logging in...' : 'Start Your Journey'}
+              {loading ? 'Verificando...' : 'Iniciar Jornada'}
             </Button>
           </form>
         </CardContent>
