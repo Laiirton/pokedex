@@ -294,8 +294,12 @@ export default function CatchPokemon() {
         </div>
       </div>
 
-      <div className="flex justify-center gap-4">
-        <Button onClick={catchSinglePokemon} disabled={capturing}>
+      <div className="flex flex-col sm:flex-row justify-center gap-4">
+        <Button 
+          onClick={catchSinglePokemon} 
+          disabled={capturing}
+          className="w-full sm:w-auto"
+        >
           {capturing ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -305,7 +309,11 @@ export default function CatchPokemon() {
             'Capturar Um'
           )}
         </Button>
-        <Button onClick={catchMultiplePokemon} disabled={capturing}>
+        <Button 
+          onClick={catchMultiplePokemon} 
+          disabled={capturing}
+          className="w-full sm:w-auto"
+        >
           {capturing ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -320,7 +328,7 @@ export default function CatchPokemon() {
       {capturedPokemon.length > 0 && (
         <div className="mt-8">
           <h2 className="text-xl font-bold mb-4">Pokémon Capturados</h2>
-          <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          <div className="grid gap-4 grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {capturedPokemon.map((pokemon, index) => (
               <PokemonCard
                 key={index}

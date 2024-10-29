@@ -86,6 +86,10 @@ module.exports = {
         'fade-in': 'fade-in 0.3s ease-out forwards',
         'blob': 'blob 7s infinite'
       },
+      screens: {
+        'xs': '475px',
+        // ... outros breakpoints padrão do Tailwind
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],

@@ -195,7 +195,7 @@ export default function PokemonList() {
       </div>
 
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg bg-accent/50 border border-border/50">
+        <div className="flex flex-col gap-4 p-4 rounded-lg bg-accent/50 border border-border/50">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -216,34 +216,38 @@ export default function PokemonList() {
             )}
           </div>
           
-          <div className="flex gap-4">
-            <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-[180px] bg-background/50">
-                <Filter className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Filtrar por tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os Pokémon</SelectItem>
-                <SelectItem value="shiny">✨ Shiny</SelectItem>
-                <SelectItem value="legendary">👑 Lendários</SelectItem>
-                <SelectItem value="mythical">🌟 Míticos</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex flex-col sm:flex-row gap-4 w-full">
+            <div className="flex-1">
+              <Select value={filter} onValueChange={setFilter}>
+                <SelectTrigger className="w-full bg-background/50">
+                  <Filter className="mr-2 h-4 w-4" />
+                  <SelectValue placeholder="Filtrar por tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os Pokémon</SelectItem>
+                  <SelectItem value="shiny">✨ Shiny</SelectItem>
+                  <SelectItem value="legendary">👑 Lendários</SelectItem>
+                  <SelectItem value="mythical">🌟 Míticos</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[180px] bg-background/50">
-                <SelectValue placeholder="Ordenar por" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="name">Nome (A-Z)</SelectItem>
-                <SelectItem value="count">Quantidade</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex-1">
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-full bg-background/50">
+                  <SelectValue placeholder="Ordenar por" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="name">Nome (A-Z)</SelectItem>
+                  <SelectItem value="count">Quantidade</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
         {filteredAndSortedPokemon.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="grid gap-4 grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {filteredAndSortedPokemon.map((p) => (
               <div key={`${p.pokemon_name}-${p.is_shiny}`} className="group">
                 <div className="relative">

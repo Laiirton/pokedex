@@ -113,7 +113,7 @@ export default function Trades() {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="flex flex-col sm:flex-row items-center gap-8 justify-center">
-                <div className="text-center group">
+                <div className="text-center group w-full sm:w-auto">
                   <div className="relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-lg blur-xl group-hover:blur-2xl transition-all opacity-0 group-hover:opacity-70" />
                     <img
@@ -130,9 +130,9 @@ export default function Trades() {
                   </p>
                 </div>
 
-                <div className="text-3xl text-primary/60">⇄</div>
+                <div className="text-3xl text-primary/60 rotate-90 sm:rotate-0">⇄</div>
 
-                <div className="text-center group">
+                <div className="text-center group w-full sm:w-auto">
                   {trade.receiver_pokemon ? (
                     <>
                       <div className="relative">
@@ -158,7 +158,7 @@ export default function Trades() {
                 </div>
               </div>
 
-              <div className="mt-6 flex justify-end gap-2">
+              <div className="mt-6 flex flex-col sm:flex-row justify-end gap-2">
                 {trade.status === 'pending' && trade.receiver_user_id === user?.id && (
                   <>
                     <Button

@@ -88,12 +88,12 @@ export default function Ranking() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
+        <Table className="w-full">
           <TableHeader>
             <TableRow className="hover:bg-accent/50">
-              <TableHead className="w-24">Posição</TableHead>
+              <TableHead className="w-20 sm:w-24">Posição</TableHead>
               <TableHead>Treinador</TableHead>
-              <TableHead className="text-right">Total</TableHead>
+              <TableHead className="text-right w-20 sm:w-24">Total</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -131,7 +131,7 @@ export default function Ranking() {
       </div>
       
       <Tabs defaultValue="total" className="space-y-6">
-        <TabsList className="grid grid-cols-4 max-w-[600px] mx-auto">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 max-w-[600px] mx-auto">
           <TabsTrigger value="total" className="data-[state=active]:bg-primary/20">Total</TabsTrigger>
           <TabsTrigger value="shiny" className="data-[state=active]:bg-yellow-500/20">Shiny</TabsTrigger>
           <TabsTrigger value="legendary" className="data-[state=active]:bg-purple-500/20">Lendários</TabsTrigger>
