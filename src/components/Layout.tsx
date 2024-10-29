@@ -17,6 +17,11 @@ export default function Layout() {
     { name: 'Pokémon List', href: '/pokemon', icon: ListFilter },
     { name: 'Trades', href: '/trades', icon: RefreshCcw },
     { name: 'Companion', href: '/companion', icon: User },
+    {
+      title: 'Capturar',
+      href: '/catch',
+      icon: User
+    },
   ];
 
   return (

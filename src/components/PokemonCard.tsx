@@ -19,8 +19,16 @@ export function PokemonCard({
   isMythical,
   count
 }: PokemonCardProps) {
+  const cardClass = isShiny
+    ? 'bg-yellow-500/20'
+    : isLegendary
+    ? 'bg-purple-500/20'
+    : isMythical
+    ? 'bg-blue-500/20'
+    : 'bg-accent/50';
+
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-accent/50 backdrop-blur-sm">
+    <Card className={`overflow-hidden hover:shadow-lg transition-shadow duration-300 ${cardClass} backdrop-blur-sm`}>
       <CardContent className="p-4">
         <div className="aspect-square relative rounded-lg overflow-hidden bg-accent/30 mb-4">
           <img
@@ -58,9 +66,9 @@ export function PokemonCard({
             )}
           </div>
 
-          {count !== undefined && (
+          {count !== undefined && count > 1 && (
             <p className="text-sm text-center text-muted-foreground mt-2">
-              Count: {count}
+              Quantidade: {count}
             </p>
           )}
         </div>

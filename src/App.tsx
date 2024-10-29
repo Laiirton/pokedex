@@ -6,6 +6,7 @@ import Dashboard from '@/pages/Dashboard';
 import PokemonList from '@/pages/PokemonList';
 import Trades from '@/pages/Trades';
 import Companion from '@/pages/Companion';
+import CatchPokemon from '@/pages/CatchPokemon';
 import Layout from '@/components/Layout';
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/pokemon" element={<PokemonList />} />
+            <Route path="/catch" element={<CatchPokemon />} />
             <Route path="/trades" element={<Trades />} />
             <Route path="/companion" element={<Companion />} />
           </Route>
