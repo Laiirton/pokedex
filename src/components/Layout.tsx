@@ -1,10 +1,14 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Gamepad2, ListFilter, RefreshCcw, User, CircleDot, Trophy } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
-export default function Layout() {
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+export default function Layout({ children }: LayoutProps) {
   const { user, logout } = useAuth();
   const location = useLocation();
 
@@ -66,7 +70,7 @@ export default function Layout() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Outlet />
+        {children}
       </main>
     </div>
   );
