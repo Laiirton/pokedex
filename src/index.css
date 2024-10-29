@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --ring: 216 34% 17%;
+
+    --radius: 0.5rem;
+
+    /* Pokemon Type Colors */
+    --type-normal: 168, 168, 120;
+    --type-fire: 240, 128, 48;
+    --type-water: 104, 144, 240;
+    --type-electric: 248, 208, 48;
+    --type-grass: 120, 200, 80;
+    --type-ice: 152, 216, 216;
+    --type-fighting: 192, 48, 40;
+    --type-poison: 160, 64, 160;
+    --type-ground: 224, 192, 104;
+    --type-flying: 168, 144, 240;
+    --type-psychic: 248, 88, 136;
+    --type-bug: 168, 184, 32;
+    --type-rock: 184, 160, 56;
+    --type-ghost: 112, 88, 152;
+    --type-dragon: 112, 56, 248;
+    --type-dark: 112, 88, 72;
+    --type-steel: 184, 184, 208;
+    --type-fairy: 238, 153, 172;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+.pokemon-type {
+  @apply px-2 py-1 rounded-full text-xs font-medium text-white;
+}
+
+.type-normal { background-color: rgb(var(--type-normal)); }
+.type-fire { background-color: rgb(var(--type-fire)); }
+.type-water { background-color: rgb(var(--type-water)); }
+.type-electric { background-color: rgb(var(--type-electric)); }
+.type-grass { background-color: rgb(var(--type-grass)); }
+.type-ice { background-color: rgb(var(--type-ice)); }
+.type-fighting { background-color: rgb(var(--type-fighting)); }
+.type-poison { background-color: rgb(var(--type-poison)); }
+.type-ground { background-color: rgb(var(--type-ground)); }
+.type-flying { background-color: rgb(var(--type-flying)); }
+.type-psychic { background-color: rgb(var(--type-psychic)); }
+.type-bug { background-color: rgb(var(--type-bug)); }
+.type-rock { background-color: rgb(var(--type-rock)); }
+.type-ghost { background-color: rgb(var(--type-ghost)); }
+.type-dragon { background-color: rgb(var(--type-dragon)); }
+.type-dark { background-color: rgb(var(--type-dark)); }
+.type-steel { background-color: rgb(var(--type-steel)); }
+.type-fairy { background-color: rgb(var(--type-fairy)); }
