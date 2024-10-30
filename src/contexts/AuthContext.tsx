@@ -5,6 +5,7 @@ interface User {
   id: number;
   username: string;
   phone_number?: string;
+  is_admin: boolean;
 }
 
 interface AuthContextType {
