@@ -73,6 +73,13 @@ export default function CatchPokemon() {
 
   function updateRemainingCaptures() {
     if (!userLimits) return;
+    
+    // Se for admin, sempre terá capturas ilimitadas
+    if (user?.is_admin) {
+      setRemainingCaptures(999999);
+      setNextResetTime(null);
+      return;
+    }
 
     const lastCapture = new Date(userLimits.last_capture_time);
     const now = new Date();
@@ -94,6 +101,9 @@ export default function CatchPokemon() {
 
   async function updateCaptureCount() {
     if (!user?.id || !userLimits) return;
+    
+    // Se for admin, não atualiza o contador
+    if (user.is_admin) return;
 
     const now = new Date();
     const lastCapture = new Date(userLimits.last_capture_time);
@@ -285,11 +295,17 @@ export default function CatchPokemon() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Capturar Pokémon</h1>
         <div className="text-sm text-muted-foreground">
-          Capturas restantes: {remainingCaptures}
-          {nextResetTime && (
-            <div>
-              Próximo reset em: {Math.ceil((nextResetTime.getTime() - new Date().getTime()) / (1000 * 60))} minutos
-            </div>
+          {user?.is_admin ? (
+            <div>Modo Admin - Capturas Ilimitadas</div>
+          ) : (
+            <>
+              Capturas restantes: {remainingCaptures}
+              {nextResetTime && (
+                <div>
+                  Próximo reset em: {Math.ceil((nextResetTime.getTime() - new Date().getTime()) / (1000 * 60))} minutos
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
