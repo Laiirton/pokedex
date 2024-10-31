@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { useNavigate, useLocation } from "react-router-dom"
 import { toast } from "sonner"
 import pokeball from '@/assets/icon/pokeball_gif.gif'
 import { useAuth } from "@/contexts/AuthContext"
@@ -13,6 +13,16 @@ export function LoginScreen() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const { login } = useAuth()
+  const location = useLocation()
+  const [isAutoLogging, setIsAutoLogging] = useState(false)
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const codeFromUrl = searchParams.get('code');
+    if (codeFromUrl) {
+      setIsAutoLogging(true);
+    }
+  }, [location]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -31,6 +41,24 @@ export function LoginScreen() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (isAutoLogging) {
+    return (
+      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[url('https://images.unsplash.com/photo-1613771404784-3a5686aa2be3')] bg-cover bg-center p-4">
+        <div className="absolute inset-0 overflow-hidden backdrop-blur-sm bg-black/40" />
+        <div className="relative z-10 flex flex-col items-center space-y-4">
+          <img 
+            src={pokeball}
+            alt="Pokeball"
+            className="w-40 h-40 animate-bounce"
+          />
+          <h2 className="text-[#9d7af7] text-xl font-medium">
+            Entrando automaticamente...
+          </h2>
+        </div>
+      </div>
+    );
   }
 
   return (
