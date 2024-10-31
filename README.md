@@ -1,3 +1,13 @@
+# Pokedex
+
+![Pokedex](https://i.imgur.com/fx1x7lY.png)
+
+## Table of Contents
+- [Introdução](#introdução)
+- [Funcionalidades](#funcionalidades)
+- [Uso](#uso)
+- [Contribuindo](#contribuindo)
+
 ## Introdução
 
 Pokedex é uma aplicação de gerenciamento de Pokémon que permite aos usuários capturar, visualizar, trocar e classificar Pokémon. Ela fornece uma plataforma abrangente para os entusiastas de Pokémon gerenciarem sua coleção e interagirem com outros treinadores.
