@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface User {
   id: number;
@@ -20,10 +21,29 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkUser();
+    checkCodeInUrl();
   }, []);
+
+  async function checkCodeInUrl() {
+    try {
+      // Pega o código da URL usando URLSearchParams
+      const searchParams = new URLSearchParams(location.search);
+      const codeFromUrl = searchParams.get('code');
+
+      if (codeFromUrl && !user) {
+        await login(codeFromUrl);
+        // Remove o código da URL após o login
+        navigate('/dashboard', { replace: true });
+      }
+    } catch (error) {
+      console.error('Erro ao fazer login com código da URL:', error);
+    }
+  }
 
   async function checkUser() {
     try {
