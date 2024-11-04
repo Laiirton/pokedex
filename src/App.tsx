@@ -55,7 +55,7 @@ function PublicRoute() {
   }
 
   if (user) {
-    return <Navigate to={user.is_admin ? '/admin' : '/dashboard'} replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <LoginScreen />;
@@ -79,7 +79,9 @@ function AdminRoute() {
 
   return (
     <Layout>
-      <AdminDashboard />
+      <Routes>
+        <Route path="/admin" element={<AdminDashboard />} />
+      </Routes>
     </Layout>
   );
 }
@@ -90,7 +92,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<PublicRoute />} />
-          <Route path="/admin" element={<AdminRoute />} />
+          <Route path="/admin/*" element={<AdminRoute />} />
           <Route path="/*" element={<ProtectedRoutes />} />
         </Routes>
         <Toaster />
