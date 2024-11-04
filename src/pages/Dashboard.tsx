@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface Stats {
   totalPokemon: number;
@@ -15,6 +17,7 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchStats() {
@@ -56,6 +59,15 @@ export default function Dashboard() {
         <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
           Bem-vindo, {user?.username}!
         </h1>
+        {user?.is_admin && (
+          <Button
+            variant="outline"
+            onClick={() => navigate('/admin')}
+            className="mt-4"
+          >
+            Acessar Painel Admin
+          </Button>
+        )}
       </div>
       
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
