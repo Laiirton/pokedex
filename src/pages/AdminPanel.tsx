@@ -82,8 +82,7 @@ export default function AdminPanel() {
         is_shiny: isShiny,
         is_legendary: details.is_legendary || false,
         is_mythical: details.is_mythical || false,
-        count: 1,
-        admin_generated: true
+        count: 1
       });
 
       if (error) throw error;
