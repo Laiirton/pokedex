@@ -10,6 +10,7 @@ import CatchPokemon from '@/pages/CatchPokemon';
 import Ranking from '@/pages/Ranking';
 import Layout from '@/components/Layout';
 import { Loader2 } from 'lucide-react';
+import AdminPanel from '@/pages/AdminPanel';
 
 // Componente para proteger rotas
 function ProtectedRoutes() {
@@ -36,6 +37,14 @@ function ProtectedRoutes() {
         <Route path="/trades" element={<Trades />} />
         <Route path="/companion" element={<Companion />} />
         <Route path="/ranking" element={<Ranking />} />
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute>
+              <AdminPanel />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
     </Layout>
   );
