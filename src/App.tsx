@@ -12,6 +12,25 @@ import Layout from '@/components/Layout';
 import { Loader2 } from 'lucide-react';
 import AdminPanel from '@/pages/AdminPanel';
 
+// Componente para proteger rotas que requerem admin
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user?.is_admin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 // Componente para proteger rotas
 function ProtectedRoutes() {
   const { user, isLoading } = useAuth();
@@ -40,9 +59,9 @@ function ProtectedRoutes() {
         <Route 
           path="/admin" 
           element={
-            <ProtectedRoute>
+            <AdminRoute>
               <AdminPanel />
-            </ProtectedRoute>
+            </AdminRoute>
           } 
         />
       </Routes>
