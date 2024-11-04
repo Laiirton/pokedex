@@ -142,7 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('pokemon_session', JSON.stringify(session));
         setUser(userData);
         setIsAdmin(userData.is_admin);
-        navigate(userData.is_admin ? '/admin' : '/dashboard');
+        navigate('/dashboard');
 
       } catch (error) {
         console.error('Erro ao fazer login:', error);
