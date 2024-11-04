@@ -10,7 +10,6 @@ import CatchPokemon from '@/pages/CatchPokemon';
 import Ranking from '@/pages/Ranking';
 import Layout from '@/components/Layout';
 import { Loader2 } from 'lucide-react';
-import AdminDashboard from '@/pages/AdminDashboard';
 
 // Componente para proteger rotas
 function ProtectedRoutes() {
@@ -61,38 +60,12 @@ function PublicRoute() {
   return <LoginScreen />;
 }
 
-// Componente para proteger rotas de administrador
-function AdminRoute() {
-  const { user, isLoading, isAdmin } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
-  if (!user || !isAdmin) {
-    return <Navigate to="/" replace />;
-  }
-
-  return (
-    <Layout>
-      <Routes>
-        <Route path="/admin" element={<AdminDashboard />} />
-      </Routes>
-    </Layout>
-  );
-}
-
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
           <Route path="/" element={<PublicRoute />} />
-          <Route path="/admin/*" element={<AdminRoute />} />
           <Route path="/*" element={<ProtectedRoutes />} />
         </Routes>
         <Toaster />
