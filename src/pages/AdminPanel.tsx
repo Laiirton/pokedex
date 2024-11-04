@@ -69,10 +69,16 @@ export default function AdminPanel() {
     try {
       const details = await getPokemonDetails(selectedPokemon);
       
+      if (!details) {
+        throw new Error('Não foi possível obter os detalhes do Pokémon');
+      }
+      
       const { error } = await supabase.from('pokemon_generated').insert({
         user_id: parseInt(selectedUser),
         pokemon_name: selectedPokemon,
-        pokemon_image_url: isShiny ? details.sprites.front_shiny : details.sprites.front_default,
+        pokemon_image_url: isShiny 
+          ? details.sprites.front_shiny || details.sprites.front_default 
+          : details.sprites.front_default,
         is_shiny: isShiny,
         is_legendary: details.is_legendary || false,
         is_mythical: details.is_mythical || false,
