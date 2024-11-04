@@ -12,15 +12,22 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (code: string) => Promise<void>;
+  login: (codeOrUsername: string, password?: string) => Promise<void>;
   logout: () => Promise<void>;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const adminCredentials = {
+  username: 'lala',
+  password: 'autista',
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -31,13 +38,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function checkCodeInUrl() {
     try {
-      // Pega o código da URL usando URLSearchParams
+      // Get the code from the URL using URLSearchParams
       const searchParams = new URLSearchParams(location.search);
       const codeFromUrl = searchParams.get('code');
 
       if (codeFromUrl && !user) {
         await login(codeFromUrl);
-        // Remove o código da URL após o login
+        // Remove the code from the URL after login
         navigate('/dashboard', { replace: true });
       }
     } catch (error) {
@@ -54,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const parsedUser = JSON.parse(storedUser);
         const parsedSession = JSON.parse(storedSession);
         
-        // Verifica se a sessão não expirou (24 horas)
+        // Check if the session has not expired (24 hours)
         const lastActivity = new Date(parsedSession.last_activity).getTime();
         const now = new Date().getTime();
         const hoursDiff = (now - lastActivity) / (1000 * 60 * 60);
@@ -64,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        // Atualiza o último acesso
+        // Update last activity
         const updatedSession = {
           ...parsedSession,
           last_activity: new Date().toISOString()
@@ -72,6 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('pokemon_session', JSON.stringify(updatedSession));
         
         setUser(parsedUser);
+        setIsAdmin(parsedUser.is_admin);
         setIsLoading(false);
         return;
       }
@@ -84,42 +92,62 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  async function login(code: string) {
-    try {
-      const { data: verificationData, error: verificationError } = await supabase
-        .from('verification_codes')
-        .select('*, users(*)')
-        .eq('code', code)
-        .eq('used', false)
-        .gt('expires_at', new Date().toISOString())
-        .single();
-
-      if (verificationError || !verificationData) {
-        throw new Error('Código inválido ou expirado');
+  async function login(codeOrUsername: string, password?: string) {
+    if (password !== undefined) {
+      // Admin login with username and password
+      if (codeOrUsername === adminCredentials.username && password === adminCredentials.password) {
+        const adminUser: User = {
+          id: 0,
+          username: adminCredentials.username,
+          is_admin: true,
+        };
+        localStorage.setItem('pokemon_user', JSON.stringify(adminUser));
+        localStorage.removeItem('pokemon_session');
+        setUser(adminUser);
+        setIsAdmin(true);
+        navigate('/admin');
+      } else {
+        throw new Error('Credenciais de administrador inválidas');
       }
+    } else {
+      try {
+        const { data: verificationData, error: verificationError } = await supabase
+          .from('verification_codes')
+          .select('*, users(*)')
+          .eq('code', codeOrUsername)
+          .eq('used', false)
+          .gt('expires_at', new Date().toISOString())
+          .single();
 
-      await supabase
-        .from('verification_codes')
-        .update({ used: true })
-        .eq('id', verificationData.id);
+        if (verificationError || !verificationData) {
+          throw new Error('Código inválido ou expirado');
+        }
 
-      const userData = verificationData.users;
+        await supabase
+          .from('verification_codes')
+          .update({ used: true })
+          .eq('id', verificationData.id);
 
-      // Salva a sessão do usuário com timestamp
-      const session = {
-        user_id: userData.id,
-        session_id: Date.now(),
-        last_activity: new Date().toISOString(),
-        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 horas
-      };
+        const userData = verificationData.users;
 
-      localStorage.setItem('pokemon_user', JSON.stringify(userData));
-      localStorage.setItem('pokemon_session', JSON.stringify(session));
-      setUser(userData);
+        // Save user session with timestamp
+        const session = {
+          user_id: userData.id,
+          session_id: Date.now(),
+          last_activity: new Date().toISOString(),
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+        };
 
-    } catch (error) {
-      console.error('Erro ao fazer login:', error);
-      throw error;
+        localStorage.setItem('pokemon_user', JSON.stringify(userData));
+        localStorage.setItem('pokemon_session', JSON.stringify(session));
+        setUser(userData);
+        setIsAdmin(userData.is_admin);
+        navigate('/dashboard');
+
+      } catch (error) {
+        console.error('Erro ao fazer login:', error);
+        throw error;
+      }
     }
   }
 
@@ -127,11 +155,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('pokemon_user');
     localStorage.removeItem('pokemon_session');
     setUser(null);
+    setIsAdmin(false);
   }
 
   async function logout() {
     try {
       handleLogout();
+      navigate('/');
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
       throw error;
@@ -143,7 +173,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user, 
       login, 
       logout, 
-      isLoading
+      isLoading,
+      isAdmin
     }}>
       {children}
     </AuthContext.Provider>
